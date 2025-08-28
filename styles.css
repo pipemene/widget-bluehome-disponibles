@@ -1,5 +1,9 @@
 *{box-sizing:border-box}
-:root{--bg:#0b1020;--muted:#8a93a6;--text:#eaf0ff;--accent:#3b82f6}
+:root{
+  color-scheme: dark;
+  --bg:#0b1020;--panel:#0f162e;--muted:#8a93a6;--text:#eaf0ff;--accent:#3b82f6;
+  --input-bg:rgba(255,255,255,0.06);--input-bd:rgba(255,255,255,0.28);--input-bd-focus:#3b82f6;--input-text:#eaf0ff;--input-placeholder:#a3adc4
+}
 html,body{margin:0;padding:0;background:linear-gradient(180deg,#0a0f1e,#101a38);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 .app-header{padding:24px 20px 8px;max-width:1280px;margin:auto}
 .brand{display:flex;align-items:center;gap:16px}
@@ -11,7 +15,29 @@ html,body{margin:0;padding:0;background:linear-gradient(180deg,#0a0f1e,#101a38);
 .filters{display:grid;gap:12px}
 .filter{display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:12px}
 .filter label{font-size:12px;color:var(--muted)}
-.filter select,.filter input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:var(--text);outline:none}
+
+/* Inputs y selects con alto contraste */
+.filter select,.filter input{
+  padding:10px;border-radius:10px;
+  border:1px solid var(--input-bd);
+  background:var(--input-bg);
+  color:var(--input-text);
+  outline:none;
+  appearance:none;
+}
+.filter select:focus,.filter input:focus{border-color:var(--input-bd-focus); box-shadow:0 0 0 2px rgba(59,130,246,.25)}
+.filter input::placeholder{color:var(--input-placeholder)}
+/* Opciones del desplegable (mejora contraste en la mayoría de navegadores) */
+.filter select option{
+  background:var(--panel);
+  color:var(--input-text);
+}
+/* Para Windows/Chrome a veces ayuda forzar color del listbox */
+select::-ms-expand{background:transparent;color:var(--input-text)}
+select:-internal-list-box, select::-webkit-listbox{
+  background:var(--panel); color:var(--input-text);
+}
+
 .actions{display:flex;gap:10px}
 button{border:none;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer;background:var(--accent);color:white}
 button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.25)}

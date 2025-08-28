@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buscador Blue Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="./logo-bluehome.png" alt="Blue Home Inmobiliaria" class="logo" onerror="this.style.display='none'">
+      <h1>Inmuebles disponibles</h1>
+    </div>
+    <p class="muted">Datos sincronizados automáticamente desde Google Sheets.</p>
+  </header>
+
+  <section class="filters">
+    <div class="filter">
+      <label for="tipo">Tipo</label>
+      <select id="tipo">
+        <option value="">Todos</option>
+        <option value="casa">Casa</option>
+        <option value="apartamento">Apartamento</option>
+        <option value="apartaestudio">Apartaestudio</option>
+        <option value="local">Local</option>
+        <option value="bodega">Bodega</option>
+      </select>
+    </div>
+    <div class="filter">
+      <label for="habitaciones">Habitaciones</label>
+      <select id="habitaciones">
+        <option value="">Todas</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4+</option>
+      </select>
+    </div>
+    <div class="filter">
+      <label for="presupuesto">Presupuesto máx. (COP)</label>
+      <input id="presupuesto" type="number" placeholder="Ej: 1200000" min="0" step="50000" />
+    </div>
+    <div class="filter">
+      <label for="buscar">Buscar (código / dirección)</label>
+      <input id="buscar" type="text" placeholder="Ej: 102, Calle 31..." />
+    </div>
+    <div class="filter actions">
+      <button id="aplicar">Aplicar filtros</button>
+      <button id="limpiar" class="secondary">Limpiar</button>
+    </div>
+  </section>
+
+  <main id="results" class="results">
+    <div id="loading" class="loading">Cargando inmuebles...</div>
+  </main>
+
+  <template id="card-tpl">
+    <article class="card">
+      <div class="card-media">
+        <iframe class="yt" src="" title="Video del inmueble" loading="lazy" allowfullscreen referrerpolicy="no-referrer"></iframe>
+      </div>
+      <div class="card-body">
+        <div class="pill-row">
+          <span class="pill pill-tipo"></span>
+          <span class="pill pill-estado"></span>
+        </div>
+        <h2 class="title"></h2>
+        <ul class="meta">
+          <li><strong>Canon:</strong> <span class="canon"></span></li>
+          <li><strong>Habitaciones:</strong> <span class="hab"></span></li>
+          <li><strong>Baños:</strong> <span class="ban"></span></li>
+          <li><strong>Parqueadero:</strong> <span class="paq"></span></li>
+        </ul>
+        <div class="cta-row">
+          <a class="btn" data-youtube target="_blank" rel="noopener">Ver video</a>
+          <a class="btn secondary" data-ficha target="_blank" rel="noopener">Ficha técnica</a>
+        </div>
+        <div class="code">Código: <span class="codigo"></span></div>
+      </div>
+    </article>
+  </template>
+
+  <footer class="app-footer">
+    <small>© <span id="year"></span> Blue Home Inmobiliaria · Palmira & Cali</small>
+  </footer>
+
+  <script>
+    window.SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTe5bAfaAIJDsDj6Hgz43yQ7gQ9TSm77Pp-g-3zBby_PuCknOfOta_3KsQX0-ofmG7hY6zDcxU3qBcS/pub?gid=0&single=true&output=csv";
+  </script>
+  <script src="./widget.js"></script>
+</body>
+</html>

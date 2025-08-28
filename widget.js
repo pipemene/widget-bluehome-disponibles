@@ -1,13 +1,11 @@
-// v4: encabezados resilientes (sin tildes/espacios) + logs de depuración
+// v5 – mismo motor de datos, layout responsive mejorado para desktop
 const CSV_URL = window.SHEET_CSV_URL;
 const $ = (s, r=document)=>r.querySelector(s);
 const fmtMoney = (n)=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n)||0);
 const numFrom = (s)=>s?Number(String(s).replace(/[^0-9]/g,''))||0:0;
 const normKey = (k)=>String(k||"").normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
-// YouTube id
 const iframeYT = (url)=>{if(!url)return '';const m=String(url).match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);return m?`https://www.youtube.com/embed/${m[1]}`:url;};
 
-// Mapas de posibles nombres
 const KEYMAP = {
   codigo: ['codigo','codigoinmueble','id','code'],
   direccion: ['direccion','ubicacion','direccioninmueble'],
@@ -28,7 +26,6 @@ function findKey(obj, aliases){
   }
   return null;
 }
-
 function pick(obj, name){
   const aliases = (KEYMAP[name]||[]).map(normKey);
   const realKey = findKey(obj, aliases);
@@ -39,9 +36,7 @@ async function fetchRows(){
   const res = await fetch(CSV_URL, {cache:"no-store"});
   const text = await res.text();
   const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
-  // normaliza keys almacenando el original
   const rows = (parsed.data||[]).map(r=>r);
-  // Log de depuración (visible en consola del navegador)
   console.log("CSV headers:", Object.keys(rows[0]||{}));
   return rows;
 }
@@ -61,9 +56,28 @@ function normalize(row){
   };
 }
 
+function applyFilters(data){
+  const t = $("#tipo").value;
+  const h = $("#habitaciones").value;
+  const pmax = parseInt($("#presupuesto").value||"0",10);
+  const q = ($("#buscar").value||"").toLowerCase();
+  return data.filter(r=>{
+    if (r.estado && r.estado.startsWith("no")) return false;
+    if (t && r.tipo !== t) return false;
+    if (h){
+      const n = parseInt(r.habitaciones||"0",10);
+      const bucket = isNaN(n) ? "" : (n>=4?"4":String(n));
+      if (bucket !== h) return false;
+    }
+    if (pmax && Number(r.valor||0) > pmax) return false;
+    if (q && !(`${r.codigo} ${r.direccion}`.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
 function render(list){
   const results=$("#results"); results.innerHTML="";
-  if(!list.length){ results.innerHTML='<div class="loading">No hay inmuebles.</div>'; return; }
+  if(!list.length){ results.innerHTML='<div class="loading">No hay inmuebles que coincidan con los filtros.</div>'; return; }
   const tpl=$("#card-tpl");
   list.forEach(item=>{
     const c = tpl.content.cloneNode(true);
@@ -79,7 +93,7 @@ function render(list){
     pe.classList.add(item.estado==='disponible'?'ok':'no');
     if(item.youtube){ c.querySelector(".yt").src = iframeYT(item.youtube); } else { c.querySelector(".yt").style.display='none'; }
     if(item.ficha){ c.querySelector("[data-ficha]").href = item.ficha; } else { c.querySelector("[data-ficha]").style.display='none'; }
-    $("#results").appendChild(c);
+    results.appendChild(c);
   });
 }
 
@@ -89,8 +103,14 @@ async function init(){
   const data = raw.map(normalize);
   window._RAW = raw; window._DATA = data;
   render(data);
-  document.getElementById("aplicar").addEventListener("click", ()=>render(data));
-  document.getElementById("limpiar").addEventListener("click", ()=>render(data));
+  document.getElementById("aplicar").addEventListener("click", ()=>render(applyFilters(data)));
+  document.getElementById("limpiar").addEventListener("click", ()=>{
+    document.getElementById("tipo").value="";
+    document.getElementById("habitaciones").value="";
+    document.getElementById("presupuesto").value="";
+    document.getElementById("buscar").value="";
+    render(data);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

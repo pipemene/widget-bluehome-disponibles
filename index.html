@@ -13,55 +13,64 @@
   <header class="app-header">
     <div class="brand">
       <img src="./logo-bluehome.png" alt="Blue Home Inmobiliaria" class="logo" onerror="this.style.display='none'">
-      <h1>Inmuebles disponibles</h1>
+      <div>
+        <h1>Inmuebles disponibles</h1>
+        <p class="muted">Datos sincronizados automáticamente desde Google Sheets.</p>
+      </div>
     </div>
-    <p class="muted">Datos sincronizados automáticamente desde Google Sheets.</p>
   </header>
 
-  <section class="filters">
-    <div class="filter">
-      <label for="tipo">Tipo</label>
-      <select id="tipo">
-        <option value="">Todos</option>
-        <option value="casa">Casa</option>
-        <option value="apartamento">Apartamento</option>
-        <option value="apartaestudio">Apartaestudio</option>
-        <option value="local">Local</option>
-        <option value="bodega">Bodega</option>
-      </select>
-    </div>
-    <div class="filter">
-      <label for="habitaciones">Habitaciones</label>
-      <select id="habitaciones">
-        <option value="">Todas</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4+</option>
-      </select>
-    </div>
-    <div class="filter">
-      <label for="presupuesto">Presupuesto máx. (COP)</label>
-      <input id="presupuesto" type="number" placeholder="Ej: 1200000" min="0" step="50000" />
-    </div>
-    <div class="filter">
-      <label for="buscar">Buscar (código / dirección)</label>
-      <input id="buscar" type="text" placeholder="Ej: 102, Calle 31..." />
-    </div>
-    <div class="filter actions">
-      <button id="aplicar">Aplicar filtros</button>
-      <button id="limpiar" class="secondary">Limpiar</button>
-    </div>
-  </section>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2 class="sidebar-title">Filtros</h2>
+      <div class="filters">
+        <div class="filter">
+          <label for="tipo">Tipo</label>
+          <select id="tipo">
+            <option value="">Todos</option>
+            <option value="casa">Casa</option>
+            <option value="apartamento">Apartamento</option>
+            <option value="apartaestudio">Apartaestudio</option>
+            <option value="local">Local</option>
+            <option value="bodega">Bodega</option>
+          </select>
+        </div>
+        <div class="filter">
+          <label for="habitaciones">Habitaciones</label>
+          <select id="habitaciones">
+            <option value="">Todas</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+        <div class="filter">
+          <label for="presupuesto">Presupuesto máx. (COP)</label>
+          <input id="presupuesto" type="number" placeholder="Ej: 1200000" min="0" step="50000" />
+        </div>
+        <div class="filter">
+          <label for="buscar">Buscar (código / dirección)</label>
+          <input id="buscar" type="text" placeholder="Ej: 102, Calle 31..." />
+        </div>
+        <div class="filter actions">
+          <button id="aplicar">Aplicar filtros</button>
+          <button id="limpiar" class="secondary">Limpiar</button>
+        </div>
+      </div>
+    </aside>
 
-  <main id="results" class="results">
-    <div id="loading" class="loading">Cargando inmuebles...</div>
-  </main>
+    <main id="results" class="results">
+      <div id="loading" class="loading">Cargando inmuebles...</div>
+    </main>
+  </div>
 
   <template id="card-tpl">
     <article class="card">
       <div class="card-media">
-        <iframe class="yt" src="" title="Video del inmueble" loading="lazy" allowfullscreen referrerpolicy="no-referrer"></iframe>
+        <div class="yt-wrap">
+          <iframe class="yt" src="" title="Video del inmueble" loading="lazy" allowfullscreen referrerpolicy="no-referrer"></iframe>
+        </div>
       </div>
       <div class="card-body">
         <div class="pill-row">
@@ -91,7 +100,7 @@
   <script>
     window.SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTe5bAfaAIJDsDj6Hgz43yQ7gQ9TSm77Pp-g-3zBby_PuCknOfOta_3KsQX0-ofmG7hY6zDcxU3qBcS/pub?gid=125378111&single=true&output=csv";
   </script>
-  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js?v=5"></script>
-  <script src="./widget.js?v=5"></script>
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js?v=6"></script>
+  <script src="./widget.js?v=6"></script>
 </body>
 </html>

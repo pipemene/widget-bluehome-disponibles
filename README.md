@@ -1,1 +1,1 @@
-Widget v4 con mapeo resiliente de encabezados y logs de depuración.
+Widget v5: layout responsive con sidebar en desktop y grillas 3–4 columnas.

@@ -1,8 +1,28 @@
-/* igual que antes, simplificado aquí */
-body{margin:0;font-family:Inter,sans-serif;background:#0a0f1e;color:#fff}
-.app-header,.app-footer{padding:20px;text-align:center}
-.filters,.results{max-width:1100px;margin:20px auto;display:grid;gap:12px;padding:0 20px}
-.filter{display:flex;flex-direction:column;gap:6px}
-.results{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-.card{background:#111c33;padding:14px;border-radius:12px}
-.yt{width:100%;min-height:200px}
+*{box-sizing:border-box}
+:root{--bg:#0b1020;--muted:#8a93a6;--text:#eaf0ff;--accent:#3b82f6}
+html,body{margin:0;padding:0;background:linear-gradient(180deg,#0a0f1e,#101a38);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.app-header{padding:24px 20px 8px;max-width:1100px;margin:auto;text-align:left}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{height:36px}
+.muted{color:var(--muted);margin-top:6px}
+.filters{max-width:1100px;margin:12px auto 8px;display:grid;grid-template-columns:repeat(12,1fr);gap:12px;padding:0 20px}
+.filter{display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:10px}
+.filter label{font-size:12px;color:var(--muted)}
+.filter select,.filter input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:var(--text);outline:none}
+.filter.actions{align-items:flex-start;justify-content:end}
+button{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;background:var(--accent);color:white}
+button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--text)}
+.results{max-width:1100px;margin:8px auto 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:0 20px}
+.loading{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+.card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden}
+.card-body{padding:14px 14px 16px}
+.yt{width:100%;height:220px;border:0;background:#000}
+.pill-row{display:flex;gap:8px;margin-bottom:6px}
+.pill{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);color:#cdd5e7}
+.pill-estado.ok{border-color:#10b981;background:rgba(16,185,129,0.08)}
+.pill-estado.no{border-color:#ef4444;background:rgba(239,68,68,0.08)}
+.title{margin:6px 0 2px;font-size:18px}
+.meta{list-style:none;padding:0;margin:8px 0 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.meta li{font-size:14px;color:#d7def2}
+.btn{display:inline-block;text-decoration:none;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);margin-right:8px;color:#eaf0ff}
+.code{margin-top:10px;color:#94a3b8;font-size:12px}

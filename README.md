@@ -1,1 +1,1 @@
-Widget v3 conectado al nuevo CSV gid=125378111
+Widget v4 con mapeo resiliente de encabezados y logs de depuración.

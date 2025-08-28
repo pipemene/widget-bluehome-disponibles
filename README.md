@@ -1,1 +1,1 @@
-Widget v6: Código visible (pill+título) + botón copiar.
+Widget v7: Barrio debajo del título + búsqueda por barrio.

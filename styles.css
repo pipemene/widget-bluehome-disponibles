@@ -24,6 +24,8 @@ button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.25)}
 .pill{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);color:#cdd5e7}
 .pill-estado.ok{border-color:#10b981;background:rgba(16,185,129,0.08)}
 .pill-estado.no{border-color:#ef4444;background:rgba(239,68,68,0.08)}
+.subtext{color:#cbd5e1;font-size:13px;margin:4px 0 6px}
+.subtext .label{opacity:.7}
 .btn{display:inline-block;text-decoration:none;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);margin-right:8px;color:#eaf0ff}
 .code{margin-top:10px;color:#94a3b8;font-size:12px;display:flex;align-items:center;gap:8px}
 .copy{background:transparent;border:1px solid rgba(255,255,255,0.25);color:#eaf0ff;padding:6px 10px;border-radius:8px;cursor:pointer}

@@ -50,8 +50,8 @@
           <input id="presupuesto" type="number" placeholder="Ej: 1200000" min="0" step="50000" />
         </div>
         <div class="filter">
-          <label for="buscar">Buscar (código / dirección)</label>
-          <input id="buscar" type="text" placeholder="Ej: 102, Calle 31..." />
+          <label for="buscar">Buscar (código / dirección / barrio)</label>
+          <input id="buscar" type="text" placeholder="Ej: 102, Santa Ana..." />
         </div>
         <div class="filter actions">
           <button id="aplicar">Aplicar filtros</button>
@@ -79,6 +79,7 @@
           <span class="pill pill-estado"></span>
         </div>
         <h2 class="title"></h2>
+        <div class="subtext barrio"></div>
         <ul class="meta">
           <li><strong>Canon:</strong> <span class="canon"></span></li>
           <li><strong>Habitaciones:</strong> <span class="hab"></span></li>
@@ -101,7 +102,7 @@
   <script>
     window.SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTe5bAfaAIJDsDj6Hgz43yQ7gQ9TSm77Pp-g-3zBby_PuCknOfOta_3KsQX0-ofmG7hY6zDcxU3qBcS/pub?gid=125378111&single=true&output=csv";
   </script>
-  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js?v=7"></script>
-  <script src="./widget.js?v=7"></script>
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js?v=8"></script>
+  <script src="./widget.js?v=8"></script>
 </body>
 </html>

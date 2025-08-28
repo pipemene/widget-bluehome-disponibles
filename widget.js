@@ -1,4 +1,4 @@
-// v6: muestra CÓDIGO en pill, título y con botón copiar
+// v7: campo BARRIO (texto debajo del título) + búsqueda incluye barrio
 const CSV_URL = window.SHEET_CSV_URL;
 const $ = (s, r=document)=>r.querySelector(s);
 const fmtMoney = (n)=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n)||0);
@@ -8,9 +8,10 @@ const iframeYT = (url)=>{if(!url)return '';const m=String(url).match(/(?:v=|yout
 
 const KEYMAP = {
   codigo: ['codigo','codigoinmueble','id','code','cod'],
-  direccion: ['direccion','ubicacion','direccioninmueble'],
+  direccion: ['direccion','ubicacion','direccioninmueble','direccion inmueble'],
+  barrio: ['barrio','sector','zona','colonia'],
   tipo: ['tipo','tipoinmueble'],
-  valor: ['valorcanon','canon','valor','canonmensual','valorarriendo'],
+  valor: ['valorcanon','canon','valor','canonmensual','valorarriendo','precio'],
   habitaciones: ['numerohabitaciones','habitaciones','habitacion'],
   banos: ['numerobanos','banos','baños'],
   parqueadero: ['parqueadero','garaje','parqueos'],
@@ -36,8 +37,7 @@ async function fetchRows(){
   const res = await fetch(CSV_URL, {cache:"no-store"});
   const text = await res.text();
   const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
-  const rows = (parsed.data||[]).map(r=>r);
-  return rows;
+  return (parsed.data||[]).map(r=>r);
 }
 
 function normalize(row){
@@ -45,6 +45,7 @@ function normalize(row){
   return {
     codigo: codeRaw != null ? String(codeRaw).trim() : "",
     direccion: pick(row,'direccion'),
+    barrio: pick(row,'barrio'),
     tipo: String(pick(row,'tipo')||"").toLowerCase(),
     valor: numFrom(pick(row,'valor')),
     habitaciones: pick(row,'habitaciones'),
@@ -70,31 +71,33 @@ function render(list){
   list.forEach(item=>{
     const c = tpl.content.cloneNode(true);
     const codigo = item.codigo || "—";
-    // Pill visibles
     c.querySelector(".pill-codigo").textContent = `Código ${codigo}`;
     c.querySelector(".pill-tipo").textContent = item.tipo||"—";
     const pe = c.querySelector(".pill-estado");
     pe.textContent = item.estado==='disponible'?'Disponible':'No disponible';
     pe.classList.add(item.estado==='disponible'?'ok':'no');
 
-    // Título incluye dirección + código
     const title = item.direccion ? `${item.direccion} · Código ${codigo}` : `Código ${codigo}`;
     c.querySelector(".title").textContent = title;
 
-    // Datos
+    // BARRIO debajo del título (si existe)
+    const barrioEl = c.querySelector(".barrio");
+    if (item.barrio){
+      barrioEl.innerHTML = `<span class="label">Barrio:</span> ${item.barrio}`;
+    } else {
+      barrioEl.style.display = "none";
+    }
+
     c.querySelector(".canon").textContent = fmtMoney(item.valor);
     c.querySelector(".hab").textContent = item.habitaciones||"—";
     c.querySelector(".ban").textContent = item.banos||"—";
     c.querySelector(".paq").textContent = item.parqueadero||"—";
     c.querySelector(".codigo").textContent = codigo;
 
-    // Links y video
     if(item.youtube){ c.querySelector(".yt").src = iframeYT(item.youtube); } else { c.querySelector(".yt").style.display='none'; }
     if(item.ficha){ c.querySelector("[data-ficha]").href = item.ficha; } else { c.querySelector("[data-ficha]").style.display='none'; }
 
-    // Copiar código
     attachCopy(c.querySelector(".copy"), codigo);
-
     results.appendChild(c);
   });
 }
@@ -113,7 +116,7 @@ function applyFilters(data){
       if (bucket !== h) return false;
     }
     if (pmax && Number(r.valor||0) > pmax) return false;
-    if (q && !(`${r.codigo} ${r.direccion}`.toLowerCase().includes(q))) return false;
+    if (q && !(`${r.codigo} ${r.direccion} ${r.barrio}`.toLowerCase().includes(q))) return false;
     return true;
   });
 }
@@ -122,7 +125,7 @@ async function init(){
   document.getElementById("year").textContent = new Date().getFullYear();
   const raw = await fetchRows();
   const data = raw.map(normalize);
-  window._RAW = raw; window._DATA = data;
+  window._DATA = data;
   render(data);
   document.getElementById("aplicar").addEventListener("click", ()=>render(applyFilters(data)));
   document.getElementById("limpiar").addEventListener("click", ()=>{

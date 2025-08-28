@@ -74,6 +74,7 @@
       </div>
       <div class="card-body">
         <div class="pill-row">
+          <span class="pill pill-codigo"></span>
           <span class="pill pill-tipo"></span>
           <span class="pill pill-estado"></span>
         </div>
@@ -88,7 +89,7 @@
           <a class="btn" data-youtube target="_blank" rel="noopener">Ver video</a>
           <a class="btn secondary" data-ficha target="_blank" rel="noopener">Ficha técnica</a>
         </div>
-        <div class="code">Código: <span class="codigo"></span></div>
+        <div class="code">Código: <span class="codigo"></span> <button class="copy" title="Copiar código">Copiar</button></div>
       </div>
     </article>
   </template>
@@ -100,7 +101,7 @@
   <script>
     window.SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTe5bAfaAIJDsDj6Hgz43yQ7gQ9TSm77Pp-g-3zBby_PuCknOfOta_3KsQX0-ofmG7hY6zDcxU3qBcS/pub?gid=125378111&single=true&output=csv";
   </script>
-  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js?v=6"></script>
-  <script src="./widget.js?v=6"></script>
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js?v=7"></script>
+  <script src="./widget.js?v=7"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// v5 – mismo motor de datos, layout responsive mejorado para desktop
+// v6: muestra CÓDIGO en pill, título y con botón copiar
 const CSV_URL = window.SHEET_CSV_URL;
 const $ = (s, r=document)=>r.querySelector(s);
 const fmtMoney = (n)=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n)||0);
@@ -7,7 +7,7 @@ const normKey = (k)=>String(k||"").normalize('NFD').replace(/[\u0300-\u036f]/g,'
 const iframeYT = (url)=>{if(!url)return '';const m=String(url).match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);return m?`https://www.youtube.com/embed/${m[1]}`:url;};
 
 const KEYMAP = {
-  codigo: ['codigo','codigoinmueble','id','code'],
+  codigo: ['codigo','codigoinmueble','id','code','cod'],
   direccion: ['direccion','ubicacion','direccioninmueble'],
   tipo: ['tipo','tipoinmueble'],
   valor: ['valorcanon','canon','valor','canonmensual','valorarriendo'],
@@ -37,13 +37,13 @@ async function fetchRows(){
   const text = await res.text();
   const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
   const rows = (parsed.data||[]).map(r=>r);
-  console.log("CSV headers:", Object.keys(rows[0]||{}));
   return rows;
 }
 
 function normalize(row){
+  const codeRaw = pick(row,'codigo');
   return {
-    codigo: pick(row,'codigo'),
+    codigo: codeRaw != null ? String(codeRaw).trim() : "",
     direccion: pick(row,'direccion'),
     tipo: String(pick(row,'tipo')||"").toLowerCase(),
     valor: numFrom(pick(row,'valor')),
@@ -54,6 +54,49 @@ function normalize(row){
     ficha: pick(row,'ficha'),
     estado: String(pick(row,'estado')||"disponible").toLowerCase()
   };
+}
+
+function attachCopy(btn, text){
+  btn.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(text||""); btn.textContent="¡Copiado!"; setTimeout(()=>btn.textContent="Copiar",1200); }
+    catch{ btn.textContent="Error"; setTimeout(()=>btn.textContent="Copiar",1200); }
+  });
+}
+
+function render(list){
+  const results=$("#results"); results.innerHTML="";
+  if(!list.length){ results.innerHTML='<div class="loading">No hay inmuebles que coincidan con los filtros.</div>'; return; }
+  const tpl=$("#card-tpl");
+  list.forEach(item=>{
+    const c = tpl.content.cloneNode(true);
+    const codigo = item.codigo || "—";
+    // Pill visibles
+    c.querySelector(".pill-codigo").textContent = `Código ${codigo}`;
+    c.querySelector(".pill-tipo").textContent = item.tipo||"—";
+    const pe = c.querySelector(".pill-estado");
+    pe.textContent = item.estado==='disponible'?'Disponible':'No disponible';
+    pe.classList.add(item.estado==='disponible'?'ok':'no');
+
+    // Título incluye dirección + código
+    const title = item.direccion ? `${item.direccion} · Código ${codigo}` : `Código ${codigo}`;
+    c.querySelector(".title").textContent = title;
+
+    // Datos
+    c.querySelector(".canon").textContent = fmtMoney(item.valor);
+    c.querySelector(".hab").textContent = item.habitaciones||"—";
+    c.querySelector(".ban").textContent = item.banos||"—";
+    c.querySelector(".paq").textContent = item.parqueadero||"—";
+    c.querySelector(".codigo").textContent = codigo;
+
+    // Links y video
+    if(item.youtube){ c.querySelector(".yt").src = iframeYT(item.youtube); } else { c.querySelector(".yt").style.display='none'; }
+    if(item.ficha){ c.querySelector("[data-ficha]").href = item.ficha; } else { c.querySelector("[data-ficha]").style.display='none'; }
+
+    // Copiar código
+    attachCopy(c.querySelector(".copy"), codigo);
+
+    results.appendChild(c);
+  });
 }
 
 function applyFilters(data){
@@ -72,28 +115,6 @@ function applyFilters(data){
     if (pmax && Number(r.valor||0) > pmax) return false;
     if (q && !(`${r.codigo} ${r.direccion}`.toLowerCase().includes(q))) return false;
     return true;
-  });
-}
-
-function render(list){
-  const results=$("#results"); results.innerHTML="";
-  if(!list.length){ results.innerHTML='<div class="loading">No hay inmuebles que coincidan con los filtros.</div>'; return; }
-  const tpl=$("#card-tpl");
-  list.forEach(item=>{
-    const c = tpl.content.cloneNode(true);
-    c.querySelector(".title").textContent = item.direccion || `Código ${item.codigo||'—'}`;
-    c.querySelector(".canon").textContent = fmtMoney(item.valor);
-    c.querySelector(".hab").textContent = item.habitaciones||"—";
-    c.querySelector(".ban").textContent = item.banos||"—";
-    c.querySelector(".paq").textContent = item.parqueadero||"—";
-    c.querySelector(".codigo").textContent = item.codigo||"—";
-    c.querySelector(".pill-tipo").textContent = item.tipo||"—";
-    const pe = c.querySelector(".pill-estado");
-    pe.textContent = item.estado==='disponible'?'Disponible':'No disponible';
-    pe.classList.add(item.estado==='disponible'?'ok':'no');
-    if(item.youtube){ c.querySelector(".yt").src = iframeYT(item.youtube); } else { c.querySelector(".yt").style.display='none'; }
-    if(item.ficha){ c.querySelector("[data-ficha]").href = item.ficha; } else { c.querySelector("[data-ficha]").style.display='none'; }
-    results.appendChild(c);
   });
 }
 

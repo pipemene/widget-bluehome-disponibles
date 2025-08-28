@@ -1,1 +1,1 @@
-Widget v5: layout responsive con sidebar en desktop y grillas 3–4 columnas.
+Widget v6: Código visible (pill+título) + botón copiar.

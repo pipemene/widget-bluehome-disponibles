@@ -45,7 +45,8 @@ const KEYMAP = {
   parqueadero: ['parqueadero','garaje','parqueos'],
   youtube: ['enlaceyoutube','linkyoutube','youtube'],
   ficha: ['enlacefichatecnica','fichatecnica','ficha'],
-  estado: ['estado','disponibilidad']
+  estado: ['estado','disponibilidad'],
+  maps: ['gps','mapa','googlemaps','maps','linkmaps','ubicacionmaps']
 };
 
 function findKey(obj, aliases){
@@ -81,7 +82,8 @@ function normalize(row){
     parqueadero: pick(row,'parqueadero'),
     youtube: pick(row,'youtube'),
     ficha: pick(row,'ficha'),
-    estado: String(pick(row,'estado')||"disponible").toLowerCase()
+    estado: String(pick(row,'estado')||"disponible").toLowerCase(),
+    maps: (pick(row,'maps')||"").toString().trim()
   };
 }
 
@@ -124,6 +126,7 @@ function render(list){
 
     const youtubeBtn=c.querySelector("[data-youtube]");
     const preview=c.querySelector("[data-youtube-preview]");
+    const mapsBtn=c.querySelector("[data-maps]");
     if(item.youtube){
       const watchUrl=youtubeWatchUrl(item.youtube);
       youtubeBtn.style.display='';
@@ -145,6 +148,17 @@ function render(list){
     const fichaBtn=c.querySelector("[data-ficha]");
     if(item.ficha){ fichaBtn.href = item.ficha; fichaBtn.textContent="Ficha técnica"; }
     else { fichaBtn.style.display='none'; }
+
+    if(mapsBtn){
+      if(item.maps){
+        mapsBtn.style.display='';
+        mapsBtn.href = item.maps;
+        mapsBtn.textContent = "Ver ubicación";
+        mapsBtn.setAttribute("aria-label",`Abrir la ubicación del inmueble ${codigo} en Google Maps`);
+      } else {
+        mapsBtn.style.display='none';
+      }
+    }
 
     attachCopy(c.querySelector(".copy"), codigo);
     results.appendChild(c);

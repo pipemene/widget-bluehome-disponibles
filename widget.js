@@ -1,10 +1,39 @@
 // v7: campo BARRIO (texto debajo del título) + búsqueda incluye barrio
 const CSV_URL = window.SHEET_CSV_URL;
+const WHATSAPP_PHONE = "573178574053";
 const $ = (s, r=document)=>r.querySelector(s);
 const fmtMoney = (n)=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n)||0);
 const numFrom = (s)=>s?Number(String(s).replace(/[^0-9]/g,''))||0:0;
 const normKey = (k)=>String(k||"").normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
-const iframeYT = (url)=>{if(!url)return '';const m=String(url).match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);return m?`https://www.youtube.com/embed/${m[1]}`:url;};
+const youtubeId=(url)=>{
+  if(!url) return "";
+  const str=String(url).trim();
+  try{
+    const u=new URL(str.includes("http")?str:`https://${str}`);
+    if(u.hostname.includes("youtu")){
+      if(u.searchParams.get("v")) return u.searchParams.get("v");
+      const parts=u.pathname.split("/").filter(Boolean);
+      if(parts[0]==='shorts' && parts[1]) return parts[1];
+      if(parts[0]==='embed' && parts[1]) return parts[1];
+      if(u.hostname.includes("youtu.be") && parts[0]) return parts[0];
+    }
+  }catch(e){
+    const match=str.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{6,11})/);
+    if(match) return match[1];
+  }
+  const fallback=str.match(/[\w-]{11}/);
+  return fallback?fallback[0]:"";
+};
+
+const youtubeWatchUrl=(url)=>{
+  const id=youtubeId(url);
+  return id?`https://www.youtube.com/watch?v=${id}`:String(url||"");
+};
+
+const youtubeThumb=(url)=>{
+  const id=youtubeId(url);
+  return id?`https://img.youtube.com/vi/${id}/hqdefault.jpg`:"";
+};
 
 const KEYMAP = {
   codigo: ['codigo','codigoinmueble','id','code','cod'],
@@ -17,7 +46,8 @@ const KEYMAP = {
   parqueadero: ['parqueadero','garaje','parqueos'],
   youtube: ['enlaceyoutube','linkyoutube','youtube'],
   ficha: ['enlacefichatecnica','fichatecnica','ficha'],
-  estado: ['estado','disponibilidad']
+  estado: ['estado','disponibilidad'],
+  maps: ['gps','mapa','googlemaps','maps','linkmaps','ubicacionmaps']
 };
 
 function findKey(obj, aliases){
@@ -53,7 +83,8 @@ function normalize(row){
     parqueadero: pick(row,'parqueadero'),
     youtube: pick(row,'youtube'),
     ficha: pick(row,'ficha'),
-    estado: String(pick(row,'estado')||"disponible").toLowerCase()
+    estado: String(pick(row,'estado')||"disponible").toLowerCase(),
+    maps: (pick(row,'maps')||"").toString().trim()
   };
 }
 
@@ -88,14 +119,58 @@ function render(list){
       barrioEl.style.display = "none";
     }
 
-    c.querySelector(".canon").textContent = fmtMoney(item.valor);
+    c.querySelector(".canon").textContent = item.valor>0 ? fmtMoney(item.valor) : "Por definir";
     c.querySelector(".hab").textContent = item.habitaciones||"—";
     c.querySelector(".ban").textContent = item.banos||"—";
     c.querySelector(".paq").textContent = item.parqueadero||"—";
     c.querySelector(".codigo").textContent = codigo;
 
-    if(item.youtube){ c.querySelector(".yt").src = iframeYT(item.youtube); } else { c.querySelector(".yt").style.display='none'; }
-    if(item.ficha){ c.querySelector("[data-ficha]").href = item.ficha; } else { c.querySelector("[data-ficha]").style.display='none'; }
+    const youtubeBtn=c.querySelector("[data-youtube]");
+    const preview=c.querySelector("[data-youtube-preview]");
+    const mapsBtn=c.querySelector("[data-maps]");
+    const whatsappBtn=c.querySelector("[data-whatsapp]");
+    if(item.youtube){
+      const watchUrl=youtubeWatchUrl(item.youtube);
+      youtubeBtn.style.display='';
+      youtubeBtn.href = watchUrl;
+      youtubeBtn.textContent = "Ver video en YouTube";
+      preview.style.display='flex';
+      preview.href = watchUrl;
+      const thumb=youtubeThumb(item.youtube);
+      if(thumb){
+        preview.querySelector(".yt-thumb-img").style.backgroundImage=`url('${thumb}')`;
+      }
+      preview.setAttribute("aria-label",`Ver video del inmueble ${codigo} en YouTube`);
+      youtubeBtn.setAttribute("aria-label",`Abrir en YouTube el video del inmueble ${codigo}`);
+    }else{
+      youtubeBtn.style.display='none';
+      preview.style.display='none';
+    }
+
+    const fichaBtn=c.querySelector("[data-ficha]");
+    if(item.ficha){ fichaBtn.href = item.ficha; fichaBtn.textContent="Ficha técnica"; }
+    else { fichaBtn.style.display='none'; }
+
+    if(mapsBtn){
+      if(item.maps){
+        mapsBtn.style.display='';
+        mapsBtn.href = item.maps;
+        mapsBtn.textContent = "Ver ubicación";
+        mapsBtn.setAttribute("aria-label",`Abrir la ubicación del inmueble ${codigo} en Google Maps`);
+      } else {
+        mapsBtn.style.display='none';
+      }
+    }
+
+    if(whatsappBtn){
+      const hasCode = Boolean(item.codigo);
+      const message = hasCode ?
+        `Estoy interesado en el inmueble con código ${item.codigo}.` :
+        "Estoy interesado en el inmueble.";
+      whatsappBtn.style.display='';
+      whatsappBtn.href = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+      whatsappBtn.setAttribute("aria-label",`Enviar mensaje por WhatsApp sobre el inmueble ${codigo}`);
+    }
 
     attachCopy(c.querySelector(".copy"), codigo);
     results.appendChild(c);
@@ -123,18 +198,26 @@ function applyFilters(data){
 
 async function init(){
   document.getElementById("year").textContent = new Date().getFullYear();
-  const raw = await fetchRows();
-  const data = raw.map(normalize);
-  window._DATA = data;
-  render(data);
-  document.getElementById("aplicar").addEventListener("click", ()=>render(applyFilters(data)));
-  document.getElementById("limpiar").addEventListener("click", ()=>{
-    document.getElementById("tipo").value="";
-    document.getElementById("habitaciones").value="";
-    document.getElementById("presupuesto").value="";
-    document.getElementById("buscar").value="";
+  const results = document.getElementById("results");
+  const loading = document.getElementById("loading");
+  try{
+    loading.textContent = "Sincronizando datos...";
+    const raw = await fetchRows();
+    const data = raw.map(normalize);
+    window._DATA = data;
     render(data);
-  });
+    document.getElementById("aplicar").addEventListener("click", ()=>render(applyFilters(data)));
+    document.getElementById("limpiar").addEventListener("click", ()=>{
+      document.getElementById("tipo").value="";
+      document.getElementById("habitaciones").value="";
+      document.getElementById("presupuesto").value="";
+      document.getElementById("buscar").value="";
+      render(data);
+    });
+  }catch(err){
+    console.error("Error cargando datos", err);
+    results.innerHTML = '<div class="loading">No pudimos cargar los inmuebles. Intenta actualizar la página.</div>';
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);

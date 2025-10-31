@@ -1,5 +1,6 @@
 // v7: campo BARRIO (texto debajo del título) + búsqueda incluye barrio
 const CSV_URL = window.SHEET_CSV_URL;
+const WHATSAPP_PHONE = "573178574053";
 const $ = (s, r=document)=>r.querySelector(s);
 const fmtMoney = (n)=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n)||0);
 const numFrom = (s)=>s?Number(String(s).replace(/[^0-9]/g,''))||0:0;
@@ -127,6 +128,7 @@ function render(list){
     const youtubeBtn=c.querySelector("[data-youtube]");
     const preview=c.querySelector("[data-youtube-preview]");
     const mapsBtn=c.querySelector("[data-maps]");
+    const whatsappBtn=c.querySelector("[data-whatsapp]");
     if(item.youtube){
       const watchUrl=youtubeWatchUrl(item.youtube);
       youtubeBtn.style.display='';
@@ -158,6 +160,16 @@ function render(list){
       } else {
         mapsBtn.style.display='none';
       }
+    }
+
+    if(whatsappBtn){
+      const hasCode = Boolean(item.codigo);
+      const message = hasCode ?
+        `Estoy interesado en el inmueble con código ${item.codigo}.` :
+        "Estoy interesado en el inmueble.";
+      whatsappBtn.style.display='';
+      whatsappBtn.href = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+      whatsappBtn.setAttribute("aria-label",`Enviar mensaje por WhatsApp sobre el inmueble ${codigo}`);
     }
 
     attachCopy(c.querySelector(".copy"), codigo);

@@ -233,6 +233,18 @@ button.secondary{
   color:#dbeafe;
 }
 
+.btn.whatsapp{
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  border-color:rgba(37,211,102,.6);
+  color:#f0fff4;
+  box-shadow:0 18px 38px rgba(18,140,126,.35);
+}
+
+.btn.whatsapp:hover{
+  border-color:#0b6f5c;
+  box-shadow:0 24px 50px rgba(18,140,126,.45);
+}
+
 .code{margin-top:18px;color:#9caad9;font-size:12px;display:flex;align-items:center;gap:10px}
 
 .copy{
